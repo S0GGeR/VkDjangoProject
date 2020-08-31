@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+{% if request.user.is_authenticated %}
+    <p>Добрый день, {{ request.user.last_name }} {{ request.user.first_name }} </p>
+    <p>Ваше логин: {{ request.user.username }}</p>
+    <p>Пять случайных друзей:</p>
+    {% for profile in profiles %}
+        <p>{{ profile.first_name }} {{ profile.last_name }}</p>
+        <img src="{{ profile.photo_100 }}">
+    {% endfor %}
+    <form method="post" action="{% url 'account_logout' %}">
+        {% csrf_token %}
+        {% if redirect_field_value %}
+            <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}"/>
+        {% endif %}
+        <button type="submit">Выйти</button>
+    </form>
+{% else %}
+    {% load socialaccount %}
+    {% get_providers as socialaccount_providers %}
+    {% for provider in socialaccount_providers %}
+        <a href="{% provider_login_url provider.id process=process scope=scope auth_params=auth_params %}">Авторизоваться
+        </a>
+    {% endfor %}
+{% endif %}
+
+
+</body>
+</html>
